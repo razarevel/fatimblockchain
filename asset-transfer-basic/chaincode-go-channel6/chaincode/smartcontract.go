@@ -81,6 +81,12 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 		Date:        refDate,
 		RealTimeSum: refReal,
 	}
+	stor := Storages{
+		Name:        stName,
+		Payment:     stPay,
+		Date:        stDate,
+		RealTimeSum: stReal,
+	}
 	consu := Consumers{
 		Name:        conName,
 		Payment:     conPay,
@@ -100,6 +106,7 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 		ID:               id,
 		Driller:          drill,
 		Refinery:         refin,
+		Storage:          stor,
 		Consumer:         consu,
 		ComplianceReport: complia,
 		Payment:          payment,
