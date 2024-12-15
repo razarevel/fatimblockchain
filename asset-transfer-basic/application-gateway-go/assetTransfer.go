@@ -83,8 +83,8 @@ type Env struct {
 type StorToConsu struct {
 	ID              string  `json:"ID"`
 	Name            string  `json:"Name"`
-	PumpID          string  `json:"OilPump_ID"`
-	PumpName        string  `json:"OilPump_Name"`
+	ConsumerID      string  `json:"Consumer_ID"`
+	ConsumerName    string  `json:"Consumer_Name"`
 	OilId           string  `json:"Oil_Batch_ID"`
 	OilQualityCerti string  `json:"Oil_Quality_Certificate"`
 	OilQuantity     string  `json:"Oil_Quantity"`
@@ -93,7 +93,7 @@ type StorToConsu struct {
 	IotData         IotLogs `json:"Iot_Data"`
 }
 type PumpToCustom struct {
-	ID              string  `json:"ID"`
+	ID              string  `son:"ID"`
 	Name            string  `json:"Name"`
 	ConsumerID      string  `json:"Consumer_ID"`
 	ConsumerName    string  `json:"Consumer_Name"`
@@ -167,6 +167,79 @@ func main() {
 		panic(err)
 	}
 	defer gw.Close()
+	num := 0
+	fmt.Println("1: Create Logs to Blockchins")
+	fmt.Println("2: Get Logs from Blockchins")
+	fmt.Println("3: Get Logs from Main Chain")
+	fmt.Print("Choose from 1~3: ")
+	fmt.Scanf("%d", &num)
+	switch num {
+	case 1:
+		createChains(gw)
+		break
+	case 2:
+		selecChain := 0
+		fmt.Println("\n\n\n\tChoose the Chains that you wanna see the logs of")
+		fmt.Println("1: Driller to Refinery")
+		fmt.Println("2: Refinery to Storage")
+		fmt.Println("3: Storage to Factory")
+		fmt.Println("4: Storage to Oil Pumps")
+		fmt.Println("5: Pumps to Customer")
+		fmt.Println("6: Main Chains")
+		fmt.Print("Choose from 1~6: ")
+		fmt.Scanf("%d", &selecChain)
+
+		// get logs
+		chaincodename := fmt.Sprintf("basic_channel%d", selecChain)
+		channelname := fmt.Sprintf("channel%d", selecChain)
+		network := gw.GetNetwork(channelname)
+		contract := network.GetContract(chaincodename)
+
+		selectNum := 0
+		fmt.Println("\n\n1: Get All logs")
+		fmt.Println("2: Get Logs by Id")
+		fmt.Print("Chose from 1~2: ")
+		fmt.Scanf("%d", &selectNum)
+		switch selectNum {
+		case 1:
+			getAllAssets(contract)
+			break
+		case 2:
+			assID := ""
+			fmt.Print("Enter the Asset ID: ")
+			fmt.Scanf("%s", &assID)
+			readAssetByID(contract, &assID)
+		}
+		break
+	case 3:
+		chaincodename := "basic_channel6"
+		channelname := "channel6"
+		network := gw.GetNetwork(channelname)
+		contract := network.GetContract(chaincodename)
+		selectNum := 0
+		fmt.Println("\n1: Get All logs")
+		fmt.Println("2: Get Logs by Id")
+		fmt.Print("Chose from 1~2: ")
+		fmt.Scanf("%d", &selectNum)
+		switch selectNum {
+		case 1:
+			getAllAssets(contract)
+			break
+		case 2:
+			assID := ""
+			fmt.Print("Enter the Asset ID: ")
+			fmt.Scanf("%s", &assID)
+			readAssetByID(contract, &assID)
+		}
+		break
+	}
+	//initLedger(contract)
+
+	//readAssetByID(contract)
+	//transferAssetAsync(contract)
+	//exampleErrorHandling(contract)
+}
+func createChains(gw *client.Gateway) {
 	randIDs := []string{"M001", "M002", "M003", "M004", "M005", "M006", "M007", "M008", "M009", "M010"}
 	file, err := os.Open("DrillToRefin.json")
 	if err != nil {
@@ -242,13 +315,13 @@ func main() {
 				RealTimeSum: "High in Demand",
 			},
 			Storage: Storages{
-				Name:        storValue[i].Name,
-				Payment:     storValue[i].Bill.TotalPayment,
-				Date:        storValue[i].Bill.Date,
+				Name:        refinValue[i].FacilityName,
+				Payment:     refinValue[i].Bill.TotalPayment,
+				Date:        refinValue[i].Bill.Date,
 				RealTimeSum: "Perfect Down to the bottom",
 			},
 			Consumer: Consumers{
-				Name:        storValue[i].PumpName,
+				Name:        storValue[i].ConsumerName,
 				Payment:     storValue[i].Bill.TotalPayment,
 				Date:        storValue[i].Bill.Date,
 				RealTimeSum: "Facility is perfect",
@@ -299,7 +372,7 @@ func main() {
 			case 3:
 				if i%2 == 0 {
 					fmt.Printf("\n--> Submit Transaction to Chaincode Transactions \n")
-					_, err := contract.SubmitTransaction("CreateAsset", storValue[i].ID, storValue[i].Name, storValue[i].PumpID, storValue[i].PumpName, storValue[i].OilId, storValue[i].OilQuantity, storValue[i].OilQualityCerti, storValue[i].Bill.BillNumber, storValue[i].Bill.TotalPayment, storValue[i].Bill.CarrierName, storValue[i].Bill.CarrierAddress, storValue[i].Bill.Date, storValue[i].Compliance.Temperature, storValue[i].Compliance.Pressure, storValue[i].IotData.Temperature, storValue[i].IotData.Pressure, storValue[i].IotData.Location, storValue[i].IotData.Quantity, storValue[i].IotData.Quality)
+					_, err := contract.SubmitTransaction("CreateAsset", storValue[i].ID, storValue[i].Name, storValue[i].ConsumerID, storValue[i].ConsumerName, storValue[i].OilId, storValue[i].OilQuantity, storValue[i].OilQualityCerti, storValue[i].Bill.BillNumber, storValue[i].Bill.TotalPayment, storValue[i].Bill.CarrierName, storValue[i].Bill.CarrierAddress, storValue[i].Bill.Date, storValue[i].Compliance.Temperature, storValue[i].Compliance.Pressure, storValue[i].IotData.Temperature, storValue[i].IotData.Pressure, storValue[i].IotData.Location, storValue[i].IotData.Quantity, storValue[i].IotData.Quality)
 					if err != nil {
 						panic(fmt.Errorf("failed to submit transaction: %w", err))
 					}
@@ -311,7 +384,7 @@ func main() {
 			case 4:
 				if i%2 != 0 {
 					fmt.Printf("\n--> Submit Transaction to Chaincode Transactions \n")
-					_, err := contract.SubmitTransaction("CreateAsset", storValue[i].ID, storValue[i].Name, storValue[i].PumpID, storValue[i].PumpName, storValue[i].OilId, storValue[i].OilQuantity, storValue[i].OilQualityCerti, storValue[i].Bill.BillNumber, storValue[i].Bill.TotalPayment, storValue[i].Bill.CarrierName, storValue[i].Bill.CarrierAddress, storValue[i].Bill.Date, storValue[i].Compliance.Temperature, storValue[i].Compliance.Pressure, storValue[i].IotData.Temperature, storValue[i].IotData.Pressure, storValue[i].IotData.Location, storValue[i].IotData.Quantity, storValue[i].IotData.Quality)
+					_, err := contract.SubmitTransaction("CreateAsset", storValue[i].ID, storValue[i].Name, storValue[i].ConsumerID, storValue[i].ConsumerName, storValue[i].OilId, storValue[i].OilQuantity, storValue[i].OilQualityCerti, storValue[i].Bill.BillNumber, storValue[i].Bill.TotalPayment, storValue[i].Bill.CarrierName, storValue[i].Bill.CarrierAddress, storValue[i].Bill.Date, storValue[i].Compliance.Temperature, storValue[i].Compliance.Pressure, storValue[i].IotData.Temperature, storValue[i].IotData.Pressure, storValue[i].IotData.Location, storValue[i].IotData.Quantity, storValue[i].IotData.Quality)
 					if err != nil {
 						panic(fmt.Errorf("failed to submit transaction: %w", err))
 					}
@@ -357,11 +430,6 @@ func main() {
 		}
 
 	}
-	//initLedger(contract)
-
-	//readAssetByID(contract)
-	//transferAssetAsync(contract)
-	//exampleErrorHandling(contract)
 }
 
 // newGrpcConnection creates a gRPC connection to the Gateway server.
@@ -450,8 +518,8 @@ func readFirstFile(dirPath string) ([]byte, error) {
 }
 
 // Evaluate a transaction to query ledger state.
-func getAllAssets(contract *client.Contract, context string) {
-	fmt.Printf("\n--> Evaluate Transaction: GetAllAssets, function returns all the current %s on the ledger\n", context)
+func getAllAssets(contract *client.Contract) {
+	fmt.Print("\n--> Evaluate Transaction: GetAllAssets, function returns all the current on the ledger\n")
 	evaluateResult, err := contract.EvaluateTransaction("GetAllAssets")
 	if err != nil {
 		panic(fmt.Errorf("failed to evaluate transaction: %w", err))
