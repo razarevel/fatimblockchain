@@ -15,6 +15,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"sync"
 	"time"
 
 	"github.com/hyperledger/fabric-gateway/pkg/client"
@@ -175,7 +176,235 @@ func main() {
 	fmt.Scanf("%d", &num)
 	switch num {
 	case 1:
-		createChains(gw)
+		randIDs := []string{"M001", "M002", "M003", "M004", "M005", "M006", "M007", "M008", "M009", "M010"}
+		file, err := os.Open("DrillToRefin.json")
+		if err != nil {
+			log.Fatal(fmt.Sprintf("You're terrible at this. err: %s", err))
+		}
+
+		defer file.Close()
+		byteValue, err := ioutil.ReadAll(file)
+		if err != nil {
+			log.Fatal(fmt.Sprintf("Just give up coding err: %s", err))
+		}
+
+		var drillValue []DrillToRefin
+		err = json.Unmarshal(byteValue, &drillValue)
+		if err != nil {
+			log.Fatal(fmt.Sprintf("Sucks to be you: %s", err))
+		}
+
+		file1, err := os.Open("RefinToStor.json")
+		if err != nil {
+			log.Fatal(fmt.Sprintf("You're terrible at this. err: %s", err))
+		}
+
+		defer file1.Close()
+		byteValue1, err := ioutil.ReadAll(file1)
+		if err != nil {
+			log.Fatal(fmt.Sprintf("Just give up coding err: %s", err))
+		}
+
+		var refinValue []RefToStorage
+		err = json.Unmarshal(byteValue1, &refinValue)
+		if err != nil {
+			log.Fatal(fmt.Sprintf("Yo dogg you got some error here err: %s", err))
+		}
+
+		file2, err := os.Open("StorToConsu.json")
+		if err != nil {
+			log.Fatal(fmt.Sprintf("You're terrible at this. err: %s", err))
+		}
+
+		defer file2.Close()
+		byteValue2, err := ioutil.ReadAll(file2)
+
+		if err != nil {
+			log.Fatal(fmt.Sprintf("Just give up coding err: %s", err))
+		}
+
+		var storValue []StorToConsu
+
+		err = json.Unmarshal(byteValue2, &storValue)
+		if err != nil {
+			log.Fatal(fmt.Sprintf("It's alright no one can do programming: %s", err))
+		}
+
+		file4, err := os.Open("PumpToCust.json")
+		if err != nil {
+			log.Fatal(fmt.Sprintf("eeya desu yo Dare da yo.: %s", err))
+		}
+
+		defer file4.Close()
+		byteValue4, err := ioutil.ReadAll(file4)
+		if err != nil {
+			log.Fatal(fmt.Sprintf("Just give up coding err: %s", err))
+		}
+
+		var pumpCustom []PumpToCustom
+		err = json.Unmarshal(byteValue4, &pumpCustom)
+		if err != nil {
+			log.Fatal(fmt.Sprintf("Just Give up programming: %s", err))
+		}
+		//Channel 1
+		chaincodename1 := fmt.Sprintf("basic_channel%d", 1)
+		channelname1 := fmt.Sprintf("channel%d", 1)
+		network1 := gw.GetNetwork(channelname1)
+		contract1 := network1.GetContract(chaincodename1)
+
+		// channel 2
+		chaincodename2 := fmt.Sprintf("basic_channel%d", 2)
+		channelname2 := fmt.Sprintf("channel%d", 2)
+		network2 := gw.GetNetwork(channelname2)
+		contract2 := network2.GetContract(chaincodename2)
+
+		// channel 3
+		chaincodename3 := fmt.Sprintf("basic_channel%d", 3)
+		channelname3 := fmt.Sprintf("channel%d", 3)
+		network3 := gw.GetNetwork(channelname3)
+		contract3 := network3.GetContract(chaincodename3)
+
+		// channel 4
+		chaincodename4 := fmt.Sprintf("basic_channel%d", 4)
+		channelname4 := fmt.Sprintf("channel%d", 4)
+		network4 := gw.GetNetwork(channelname4)
+		contract4 := network4.GetContract(chaincodename4)
+
+		// channel 5
+		chaincodename5 := fmt.Sprintf("basic_channel%d", 5)
+		channelname5 := fmt.Sprintf("channel%d", 5)
+		network5 := gw.GetNetwork(channelname5)
+		contract5 := network5.GetContract(chaincodename5)
+
+		// channel 6
+		chaincodename6 := fmt.Sprintf("basic_channel%d", 6)
+		channelname6 := fmt.Sprintf("channel%d", 6)
+		network6 := gw.GetNetwork(channelname6)
+		contract6 := network6.GetContract(chaincodename6)
+
+		var wg sync.WaitGroup
+		ch := make(chan string)
+		//async
+		startTime := time.Now()
+		nums := 1000
+		for j := 0; j < nums; j++ {
+			i := j % 10
+			mainChain := MainChain{
+				ID: fmt.Sprintf("%s%d", randIDs[i], j),
+				Driller: Drilling{
+					Name:    drillValue[i].Driller_Name,
+					Payment: drillValue[i].Bill.TotalPayment,
+					Date:    drillValue[i].Date,
+				},
+				Refinery: Refineries{
+					Name:        refinValue[i].Name,
+					Payment:     refinValue[i].Bill.TotalPayment,
+					Date:        refinValue[i].Bill.Date,
+					RealTimeSum: "High in Demand",
+				},
+				Storage: Storages{
+					Name:        refinValue[i].FacilityName,
+					Payment:     refinValue[i].Bill.TotalPayment,
+					Date:        refinValue[i].Bill.Date,
+					RealTimeSum: "Perfect Down to the bottom",
+				},
+				Consumer: Consumers{
+					Name:        storValue[i].ConsumerName,
+					Payment:     storValue[i].Bill.TotalPayment,
+					Date:        storValue[i].Bill.Date,
+					RealTimeSum: "Facility is perfect",
+				},
+				ComplianceReport: "Perfect down to the very last bottom perfect",
+				Payment:          "$ 110,000",
+				OilId:            drillValue[i].OilID,
+				OilQualityCerti:  refinValue[i].OilQualityCerti,
+				OilQuantity:      refinValue[i].OilQuantityCerti,
+				Time:             "72 hour",
+				DigitalSignature: drillValue[i].DigitalSignature,
+				IotData: []IotLogs{
+					drillValue[i].IoTData,
+					refinValue[i].IoTData,
+					storValue[i].IotData,
+				},
+			}
+			wg.Add(1)
+			go func(i int) {
+				defer wg.Done()
+				_, err := contract1.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d", drillValue[i].ID, j), drillValue[i].Driller_Name, drillValue[i].RefineryID, drillValue[i].RefinierName, drillValue[i].OilID, drillValue[i].Date, drillValue[i].OilQualityCerti, drillValue[i].DrillerReport, drillValue[i].Bill.BillNumber, drillValue[i].Bill.TotalPayment, drillValue[i].Bill.CarrierName, drillValue[i].Bill.CarrierAddress, drillValue[i].Bill.Date, drillValue[i].DigitalSignature, drillValue[i].IoTData.Temperature, drillValue[i].IoTData.Pressure, drillValue[i].IoTData.Location, drillValue[i].IoTData.Quantity, drillValue[i].IoTData.Quality)
+				if err != nil {
+					panic(fmt.Errorf("failed to submit transaction: %w", err))
+				}
+
+			}(i)
+
+			// write to Refinery to Storage
+			wg.Add(1)
+			go func(i int) {
+				defer wg.Done()
+				_, err := contract2.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d", refinValue[i].ID, j), refinValue[i].Name, refinValue[i].FacilityID, refinValue[i].FacilityName, refinValue[i].OilID, refinValue[i].RefineryDetail, refinValue[i].OilQuantityCerti, refinValue[i].OilQualityCerti, refinValue[i].Bill.BillNumber, refinValue[i].Bill.TotalPayment, refinValue[i].Bill.CarrierName, refinValue[i].Bill.CarrierAddress, refinValue[i].Bill.Date, refinValue[i].DigitalSignature, refinValue[i].IoTData.Temperature, refinValue[i].IoTData.Pressure, refinValue[i].IoTData.Location, refinValue[i].IoTData.Quantity, refinValue[i].IoTData.Quality)
+				if err != nil {
+					panic(fmt.Errorf("failed to submit transaction: %w", err))
+				}
+			}(i)
+
+			// Storage to Pump or Factory
+			wg.Add(1)
+			go func(i int) {
+				defer wg.Done()
+				if i%2 == 0 {
+					_, err := contract3.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d", storValue[i].ID, j), storValue[i].Name, storValue[i].ConsumerID, storValue[i].ConsumerName, storValue[i].OilId, storValue[i].OilQuantity, storValue[i].OilQualityCerti, storValue[i].Bill.BillNumber, storValue[i].Bill.TotalPayment, storValue[i].Bill.CarrierName, storValue[i].Bill.CarrierAddress, storValue[i].Bill.Date, storValue[i].Compliance.Temperature, storValue[i].Compliance.Pressure, storValue[i].IotData.Temperature, storValue[i].IotData.Pressure, storValue[i].IotData.Location, storValue[i].IotData.Quantity, storValue[i].IotData.Quality)
+					if err != nil {
+						panic(fmt.Errorf("failed to submit transaction: %w", err))
+					}
+				}
+			}(i)
+
+			wg.Add(1)
+			go func(i int) {
+				defer wg.Done()
+				if i%2 != 0 {
+					_, err := contract4.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d", storValue[i].ID, j), storValue[i].Name, storValue[i].ConsumerID, storValue[i].ConsumerName, storValue[i].OilId, storValue[i].OilQuantity, storValue[i].OilQualityCerti, storValue[i].Bill.BillNumber, storValue[i].Bill.TotalPayment, storValue[i].Bill.CarrierName, storValue[i].Bill.CarrierAddress, storValue[i].Bill.Date, storValue[i].Compliance.Temperature, storValue[i].Compliance.Pressure, storValue[i].IotData.Temperature, storValue[i].IotData.Pressure, storValue[i].IotData.Location, storValue[i].IotData.Quantity, storValue[i].IotData.Quality)
+					if err != nil {
+						panic(fmt.Errorf("failed to submit transaction: %w", err))
+					}
+
+				}
+
+			}(i)
+			// Pump to Customer
+			wg.Add(1)
+
+			go func(i int) {
+				defer wg.Done()
+				if i%2 != 0 {
+					_, err := contract5.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d", pumpCustom[i].ID, j), pumpCustom[i].Name, pumpCustom[i].ConsumerID, pumpCustom[i].ConsumerName, pumpCustom[i].OilId, pumpCustom[i].OilQuantity, pumpCustom[i].OilQualityCerti, pumpCustom[i].Bill.BillNumber, pumpCustom[i].Bill.TotalPayment, pumpCustom[i].Bill.CarrierName, pumpCustom[i].Bill.CarrierAddress, pumpCustom[i].Bill.Date, pumpCustom[i].IotData.Temperature, pumpCustom[i].IotData.Pressure, pumpCustom[i].IotData.Location, pumpCustom[i].IotData.Quantity, pumpCustom[i].IotData.Quality)
+					if err != nil {
+						panic(fmt.Errorf("failed to submit transaction: %w", err))
+					}
+				}
+			}(i)
+			wg.Add(1)
+			go func(i int) {
+				defer wg.Done()
+				_, err := contract6.SubmitTransaction("CreateAsset", mainChain.ID, mainChain.Driller.Name, mainChain.Driller.Payment, mainChain.Driller.Date, mainChain.Refinery.Name, mainChain.Refinery.Payment, mainChain.Refinery.Date, mainChain.Refinery.RealTimeSum, mainChain.Storage.Name, mainChain.Storage.Payment, mainChain.Storage.Date, mainChain.Storage.RealTimeSum, mainChain.Consumer.Name, mainChain.Consumer.Payment, mainChain.Consumer.Date, mainChain.Consumer.RealTimeSum, mainChain.ComplianceReport, mainChain.Payment, mainChain.OilId, mainChain.OilQuantity, mainChain.OilQuantity, mainChain.Time, mainChain.DigitalSignature, mainChain.IotData[0].Temperature, mainChain.IotData[0].Pressure, mainChain.IotData[0].Location, mainChain.IotData[0].Quantity, mainChain.IotData[0].Quality)
+				if err != nil {
+					panic(fmt.Errorf("failed to submit transaction: %w", err))
+				}
+			}(i)
+
+		}
+		go func() {
+			wg.Wait()
+			close(ch)
+		}()
+
+		for result := range ch {
+			fmt.Println(result)
+		}
+
+		endTime := time.Now()
+		fmt.Printf("Numebr of transaction: %d, Time takken: %s\n", nums, endTime.Sub(startTime))
+
 		break
 	case 2:
 		selecChain := 0
@@ -239,208 +468,9 @@ func main() {
 	//transferAssetAsync(contract)
 	//exampleErrorHandling(contract)
 }
-func createChains(gw *client.Gateway) {
-	randIDs := []string{"M001", "M002", "M003", "M004", "M005", "M006", "M007", "M008", "M009", "M010"}
-	file, err := os.Open("DrillToRefin.json")
-	if err != nil {
-		log.Fatal(fmt.Sprintf("You're terrible at this. err: %s", err))
-	}
-	defer file.Close()
-	byteValue, err := ioutil.ReadAll(file)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Just give up coding err: %s", err))
-	}
-	var drillValue []DrillToRefin
-	err = json.Unmarshal(byteValue, &drillValue)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Sucks to be you: %s", err))
-	}
-	file1, err := os.Open("RefinToStor.json")
-	if err != nil {
-		log.Fatal(fmt.Sprintf("You're terrible at this. err: %s", err))
-	}
-	defer file1.Close()
-	byteValue1, err := ioutil.ReadAll(file1)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Just give up coding err: %s", err))
-	}
-	var refinValue []RefToStorage
-	err = json.Unmarshal(byteValue1, &refinValue)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Yo dogg you got some error here err: %s", err))
-	}
-
-	file2, err := os.Open("StorToConsu.json")
-	if err != nil {
-		log.Fatal(fmt.Sprintf("You're terrible at this. err: %s", err))
-	}
-	defer file2.Close()
-	byteValue2, err := ioutil.ReadAll(file2)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Just give up coding err: %s", err))
-	}
-	var storValue []StorToConsu
-	err = json.Unmarshal(byteValue2, &storValue)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("It's alright no one can do programming: %s", err))
-	}
-
-	file4, err := os.Open("PumpToCust.json")
-	if err != nil {
-		log.Fatal(fmt.Sprintf("eeya desu yo Dare da yo.: %s", err))
-	}
-	defer file4.Close()
-	byteValue4, err := ioutil.ReadAll(file4)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Just give up coding err: %s", err))
-	}
-	var pumpCustom []PumpToCustom
-	err = json.Unmarshal(byteValue4, &pumpCustom)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Just Give up programming: %s", err))
-	}
-
-	for i := 0; i < 10; i++ {
-		mainChain := MainChain{
-			ID: randIDs[i],
-			Driller: Drilling{
-				Name:    drillValue[i].Driller_Name,
-				Payment: drillValue[i].Bill.TotalPayment,
-				Date:    drillValue[i].Date,
-			},
-			Refinery: Refineries{
-				Name:        refinValue[i].Name,
-				Payment:     refinValue[i].Bill.TotalPayment,
-				Date:        refinValue[i].Bill.Date,
-				RealTimeSum: "High in Demand",
-			},
-			Storage: Storages{
-				Name:        refinValue[i].FacilityName,
-				Payment:     refinValue[i].Bill.TotalPayment,
-				Date:        refinValue[i].Bill.Date,
-				RealTimeSum: "Perfect Down to the bottom",
-			},
-			Consumer: Consumers{
-				Name:        storValue[i].ConsumerName,
-				Payment:     storValue[i].Bill.TotalPayment,
-				Date:        storValue[i].Bill.Date,
-				RealTimeSum: "Facility is perfect",
-			},
-			ComplianceReport: "Perfect down to the very last bottom perfect",
-			Payment:          "$ 110,000",
-			OilId:            drillValue[i].OilID,
-			OilQualityCerti:  refinValue[i].OilQualityCerti,
-			OilQuantity:      refinValue[i].OilQuantityCerti,
-			Time:             "72 hour",
-			DigitalSignature: drillValue[i].DigitalSignature,
-			IotData: []IotLogs{
-				drillValue[i].IoTData,
-				refinValue[i].IoTData,
-				storValue[i].IotData,
-			},
-		}
-		for j := 1; j <= 6; j++ {
-			chaincodename := fmt.Sprintf("basic_channel%d", j)
-			channelname := fmt.Sprintf("channel%d", j)
-			network := gw.GetNetwork(channelname)
-			contract := network.GetContract(chaincodename)
-			switch j {
-			// write to Driller to Refinery
-			case 1:
-				fmt.Printf("\n--> Submit Transaction to Chaincode Transactions \n")
-
-				_, err := contract.SubmitTransaction("CreateAsset", drillValue[i].ID, drillValue[i].Driller_Name, drillValue[i].RefineryID, drillValue[i].RefinierName, drillValue[i].OilID, drillValue[i].Date, drillValue[i].OilQualityCerti, drillValue[i].DrillerReport, drillValue[i].Bill.BillNumber, drillValue[i].Bill.TotalPayment, drillValue[i].Bill.CarrierName, drillValue[i].Bill.CarrierAddress, drillValue[i].Bill.Date, drillValue[i].DigitalSignature, drillValue[i].IoTData.Temperature, drillValue[i].IoTData.Pressure, drillValue[i].IoTData.Location, drillValue[i].IoTData.Quantity, drillValue[i].IoTData.Quality)
-				if err != nil {
-					panic(fmt.Errorf("failed to submit transaction: %w", err))
-				}
-				printLogs(&drillValue[i].IoTData.Temperature, &drillValue[i].IoTData.Pressure, &drillValue[i].IoTData.Location, &drillValue[i].IoTData.Quantity, &drillValue[i].IoTData.Quality)
-				fmt.Printf("*** Transaction committed successfully\n")
-
-				break
-				// write to Refinery to Storage
-			case 2:
-				fmt.Printf("\n--> Submit Transaction to Chaincode Transactions \n")
-				_, err := contract.SubmitTransaction("CreateAsset", refinValue[i].ID, refinValue[i].Name, refinValue[i].FacilityID, refinValue[i].FacilityName, refinValue[i].OilID, refinValue[i].RefineryDetail, refinValue[i].OilQuantityCerti, refinValue[i].OilQualityCerti, refinValue[i].Bill.BillNumber, refinValue[i].Bill.TotalPayment, refinValue[i].Bill.CarrierName, refinValue[i].Bill.CarrierAddress, refinValue[i].Bill.Date, refinValue[i].DigitalSignature, refinValue[i].IoTData.Temperature, refinValue[i].IoTData.Pressure, refinValue[i].IoTData.Location, refinValue[i].IoTData.Quantity, refinValue[i].IoTData.Quality)
-				if err != nil {
-					panic(fmt.Errorf("failed to submit transaction: %w", err))
-				}
-
-				printLogs(&refinValue[i].IoTData.Temperature, &refinValue[i].IoTData.Pressure, &refinValue[i].IoTData.Location, &refinValue[i].IoTData.Quantity, &refinValue[i].IoTData.Quality)
-				fmt.Printf("*** Transaction committed successfully\n")
-				break
-				// Storage to Pump or Factory
-			case 3:
-				if i%2 == 0 {
-					fmt.Printf("\n--> Submit Transaction to Chaincode Transactions \n")
-					_, err := contract.SubmitTransaction("CreateAsset", storValue[i].ID, storValue[i].Name, storValue[i].ConsumerID, storValue[i].ConsumerName, storValue[i].OilId, storValue[i].OilQuantity, storValue[i].OilQualityCerti, storValue[i].Bill.BillNumber, storValue[i].Bill.TotalPayment, storValue[i].Bill.CarrierName, storValue[i].Bill.CarrierAddress, storValue[i].Bill.Date, storValue[i].Compliance.Temperature, storValue[i].Compliance.Pressure, storValue[i].IotData.Temperature, storValue[i].IotData.Pressure, storValue[i].IotData.Location, storValue[i].IotData.Quantity, storValue[i].IotData.Quality)
-					if err != nil {
-						panic(fmt.Errorf("failed to submit transaction: %w", err))
-					}
-
-					printLogs(&storValue[i].IotData.Temperature, &storValue[i].IotData.Pressure, &storValue[i].IotData.Location, &storValue[i].IotData.Quantity, &storValue[i].IotData.Quality)
-					fmt.Printf("*** Transaction committed successfully\n")
-				}
-				break
-			case 4:
-				if i%2 != 0 {
-					fmt.Printf("\n--> Submit Transaction to Chaincode Transactions \n")
-					_, err := contract.SubmitTransaction("CreateAsset", storValue[i].ID, storValue[i].Name, storValue[i].ConsumerID, storValue[i].ConsumerName, storValue[i].OilId, storValue[i].OilQuantity, storValue[i].OilQualityCerti, storValue[i].Bill.BillNumber, storValue[i].Bill.TotalPayment, storValue[i].Bill.CarrierName, storValue[i].Bill.CarrierAddress, storValue[i].Bill.Date, storValue[i].Compliance.Temperature, storValue[i].Compliance.Pressure, storValue[i].IotData.Temperature, storValue[i].IotData.Pressure, storValue[i].IotData.Location, storValue[i].IotData.Quantity, storValue[i].IotData.Quality)
-					if err != nil {
-						panic(fmt.Errorf("failed to submit transaction: %w", err))
-					}
-
-					printLogs(&storValue[i].IotData.Temperature, &storValue[i].IotData.Pressure, &storValue[i].IotData.Location, &storValue[i].IotData.Quantity, &storValue[i].IotData.Quality)
-					fmt.Printf("*** Transaction committed successfully\n")
-				}
-				break
-				// Pump to Customer
-			case 5:
-				if i%2 != 0 {
-					fmt.Printf("\n--> Submit Transaction to Chaincode Transactions \n")
-					_, err := contract.SubmitTransaction("CreateAsset", pumpCustom[i].ID, pumpCustom[i].Name, pumpCustom[i].ConsumerID, pumpCustom[i].ConsumerName, pumpCustom[i].OilId, pumpCustom[i].OilQuantity, pumpCustom[i].OilQualityCerti, pumpCustom[i].Bill.BillNumber, pumpCustom[i].Bill.TotalPayment, pumpCustom[i].Bill.CarrierName, pumpCustom[i].Bill.CarrierAddress, pumpCustom[i].Bill.Date, pumpCustom[i].IotData.Temperature, pumpCustom[i].IotData.Pressure, pumpCustom[i].IotData.Location, pumpCustom[i].IotData.Quantity, pumpCustom[i].IotData.Quality)
-					if err != nil {
-						panic(fmt.Errorf("failed to submit transaction: %w", err))
-					}
-
-					printLogs(&pumpCustom[i].IotData.Temperature, &pumpCustom[i].IotData.Pressure, &pumpCustom[i].IotData.Location, &pumpCustom[i].IotData.Quantity, &pumpCustom[i].IotData.Quality)
-					fmt.Printf("*** Transaction committed successfully\n")
-				}
-				break
-				// Main Chain
-			case 6:
-				fmt.Printf("\n--> Submit Transaction to Chaincode Transactions \n")
-
-				_, err := contract.SubmitTransaction("CreateAsset", mainChain.ID, mainChain.Driller.Name, mainChain.Driller.Payment, mainChain.Driller.Date, mainChain.Refinery.Name, mainChain.Refinery.Payment, mainChain.Refinery.Date, mainChain.Refinery.RealTimeSum, mainChain.Storage.Name, mainChain.Storage.Payment, mainChain.Storage.Date, mainChain.Storage.RealTimeSum, mainChain.Consumer.Name, mainChain.Consumer.Payment, mainChain.Consumer.Date, mainChain.Consumer.RealTimeSum, mainChain.ComplianceReport, mainChain.Payment, mainChain.OilId, mainChain.OilQuantity, mainChain.OilQuantity, mainChain.Time, mainChain.DigitalSignature, mainChain.IotData[0].Temperature, mainChain.IotData[0].Pressure, mainChain.IotData[0].Location, mainChain.IotData[0].Quantity, mainChain.IotData[0].Quality)
-				if err != nil {
-					panic(fmt.Errorf("failed to submit transaction: %w", err))
-				}
-				for k := 0; k < 3; k++ {
-					result := fmt.Sprintf("IoT Logs--> temp: %s, pressure: %s, location: %s, quantity: %s, quality: %s", mainChain.IotData[k].Temperature, mainChain.IotData[k].Pressure, mainChain.IotData[k].Pressure, mainChain.IotData[k].Quantity, mainChain.IotData[k].Quality)
-					fmt.Println(result)
-					// write to log
-					_, err := contract.SubmitTransaction("UpdateIoTLogs", mainChain.ID, mainChain.IotData[k].Temperature, mainChain.IotData[k].Pressure, mainChain.IotData[k].Pressure, mainChain.IotData[k].Quantity, mainChain.IotData[k].Quality)
-					if err != nil {
-						log.Fatal(fmt.Sprintf("Nana da yo. Omai baka janai yo er: %s", err))
-					}
-					time.Sleep(2 * time.Second)
-				}
-				fmt.Printf("*** Transaction committed successfully\n")
-				break
-			}
-		}
-
-	}
+func createChains(gw *client.Gateway, wg *sync.WaitGroup) {
 }
 
-// newGrpcConnection creates a gRPC connection to the Gateway server.
-func printLogs(temp *string, press *string, loca *string, quanti *string, quali *string) {
-	result := fmt.Sprintf("IoT Logs--> temp: %s, pressure: %s, location: %s, quantity: %s, quality: %s", *temp, *press, *loca, *quanti, *quali)
-	for i := 0; i < 3; i++ {
-		fmt.Println(result)
-		time.Sleep(2 * time.Second)
-	}
-
-}
 func newGrpcConnection() *grpc.ClientConn {
 	certificatePEM, err := os.ReadFile(tlsCertPath)
 	if err != nil {
@@ -558,30 +588,45 @@ type Asset struct {
 	Temperature string `json:"Temperature"`
 	Humidity    string `json:"Humidity"`
 }
+type LogChain struct {
+	ID               string     `json:"ID"`
+	Driller          Drilling   `json:"Driller"`
+	Refinery         Refineries `json:"Refinery"`
+	Storage          Storages   `json:"Storage"`
+	Destibutes       Destibute  `json:"Destibute"`
+	Consumer         Consumers  `json:"Consumer"`
+	ComplianceReport string     `json:"Compliance_Report"`
+	Payment          string     `json:"Payment"`
+	OilId            string     `json:"Oil_Batch_ID"`
+	OilQualityCerti  string     `json:"Oil_Quality_Certificate"`
+	OilQuantity      string     `json:"Oil_Quantity"`
+	Time             string     `json:"Time_To_Complete"`
+	DigitalSignature string     `json:"Digital_Signature"`
+	IotData          []IotLogs  `json:"IotData"`
+}
+type Destibute struct {
+	Title      string  `json:"Title"`
+	Location   string  `json:"Location"`
+	Descri     string  `json:"Description"`
+	Suggestion string  `json:"Suggestion"`
+	Active     string  `json:"Action"`
+	Time       string  `json:"Time"`
+	IotLogs    IotLogs `json:"IotLogs"`
+}
 
 func readIoTLogs(contract *client.Contract, productID *string) {
-	fmt.Printf("\n--> Evaluate Transaction: ReadAsset, function returns asset attributes\n")
-	evaluateResult, err := contract.EvaluateTransaction("GetAllAssets")
+	startTime := time.Now()
+	evaluateResult, err := contract.EvaluateTransaction("ReadAsset", *productID)
 	if err != nil {
 		panic(fmt.Errorf("failed to evaluate transaction: %w", err))
 	}
-	if evaluateResult != nil {
-		var assets []Asset
-		if err := json.Unmarshal(evaluateResult, &assets); err != nil {
-			panic(fmt.Errorf("filaed to unmarshal assets: %w", err))
-		}
-		matchAssets := filterAssetByProductID(assets, *productID)
-		if len(matchAssets) == 0 {
-			fmt.Println("No matching Logs has found")
-		} else {
-			for _, assets := range matchAssets {
-				fmt.Println(formatJSON(assetToJson(assets)))
-			}
-		}
+	result := formatJSON(evaluateResult)
+	enTime := time.Now()
+	fmt.Printf("*** Time takken:%s\n", enTime.Sub(startTime))
+	fmt.Printf("*** Result:%s\n", result)
 
-	} else {
-		fmt.Println("Empyt reuslt")
-	}
+	//evaluateResult, err := contract.EvaluateTransaction("GetAllAssets")
+
 }
 
 // Submit transaction asynchronously, blocking until the transaction has been sent to the orderer, and allowing
