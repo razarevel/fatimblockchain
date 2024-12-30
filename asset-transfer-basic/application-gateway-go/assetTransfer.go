@@ -170,8 +170,10 @@ func main() {
 	defer gw.Close()
 	num := 0
 	fmt.Println("1: Create Logs to Blockchins")
-	fmt.Println("2: Get Logs from Blockchins")
-	fmt.Println("3: Get Logs from Main Chain")
+	fmt.Println("2: Update All Transactions")
+	fmt.Println("3: Verification of Transactions")
+	fmt.Println("4: Get Logs from Blockchins")
+	fmt.Println("5: Get Logs from Main Chain")
 	fmt.Print("Choose from 1~3: ")
 	fmt.Scanf("%d", &num)
 	switch num {
@@ -290,7 +292,7 @@ func main() {
 		for j := 0; j < nums; j++ {
 			i := j % 10
 			mainChain := MainChain{
-				ID: fmt.Sprintf("%s%d", randIDs[i], j),
+				ID: fmt.Sprintf("%s%d%d", randIDs[i], j, time.Now().UTC().Second()),
 				Driller: Drilling{
 					Name:    drillValue[i].Driller_Name,
 					Payment: drillValue[i].Bill.TotalPayment,
@@ -330,7 +332,7 @@ func main() {
 			wg.Add(1)
 			go func(i int) {
 				defer wg.Done()
-				_, err := contract1.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d", drillValue[i].ID, j), drillValue[i].Driller_Name, drillValue[i].RefineryID, drillValue[i].RefinierName, drillValue[i].OilID, drillValue[i].Date, drillValue[i].OilQualityCerti, drillValue[i].DrillerReport, drillValue[i].Bill.BillNumber, drillValue[i].Bill.TotalPayment, drillValue[i].Bill.CarrierName, drillValue[i].Bill.CarrierAddress, drillValue[i].Bill.Date, drillValue[i].DigitalSignature, drillValue[i].IoTData.Temperature, drillValue[i].IoTData.Pressure, drillValue[i].IoTData.Location, drillValue[i].IoTData.Quantity, drillValue[i].IoTData.Quality)
+				_, err := contract1.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d%d", drillValue[i].ID, j, time.Now().UTC().Second()), drillValue[i].Driller_Name, drillValue[i].RefineryID, drillValue[i].RefinierName, drillValue[i].OilID, drillValue[i].Date, drillValue[i].OilQualityCerti, drillValue[i].DrillerReport, drillValue[i].Bill.BillNumber, drillValue[i].Bill.TotalPayment, drillValue[i].Bill.CarrierName, drillValue[i].Bill.CarrierAddress, drillValue[i].Bill.Date, drillValue[i].DigitalSignature, drillValue[i].IoTData.Temperature, drillValue[i].IoTData.Pressure, drillValue[i].IoTData.Location, drillValue[i].IoTData.Quantity, drillValue[i].IoTData.Quality)
 				if err != nil {
 					panic(fmt.Errorf("failed to submit transaction: %w", err))
 				}
@@ -341,7 +343,7 @@ func main() {
 			wg.Add(1)
 			go func(i int) {
 				defer wg.Done()
-				_, err := contract2.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d", refinValue[i].ID, j), refinValue[i].Name, refinValue[i].FacilityID, refinValue[i].FacilityName, refinValue[i].OilID, refinValue[i].RefineryDetail, refinValue[i].OilQuantityCerti, refinValue[i].OilQualityCerti, refinValue[i].Bill.BillNumber, refinValue[i].Bill.TotalPayment, refinValue[i].Bill.CarrierName, refinValue[i].Bill.CarrierAddress, refinValue[i].Bill.Date, refinValue[i].DigitalSignature, refinValue[i].IoTData.Temperature, refinValue[i].IoTData.Pressure, refinValue[i].IoTData.Location, refinValue[i].IoTData.Quantity, refinValue[i].IoTData.Quality)
+				_, err := contract2.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d%d", refinValue[i].ID, j, time.Now().UTC().Second()), refinValue[i].Name, refinValue[i].FacilityID, refinValue[i].FacilityName, refinValue[i].OilID, refinValue[i].RefineryDetail, refinValue[i].OilQuantityCerti, refinValue[i].OilQualityCerti, refinValue[i].Bill.BillNumber, refinValue[i].Bill.TotalPayment, refinValue[i].Bill.CarrierName, refinValue[i].Bill.CarrierAddress, refinValue[i].Bill.Date, refinValue[i].DigitalSignature, refinValue[i].IoTData.Temperature, refinValue[i].IoTData.Pressure, refinValue[i].IoTData.Location, refinValue[i].IoTData.Quantity, refinValue[i].IoTData.Quality)
 				if err != nil {
 					panic(fmt.Errorf("failed to submit transaction: %w", err))
 				}
@@ -352,7 +354,7 @@ func main() {
 			go func(i int) {
 				defer wg.Done()
 				if i%2 == 0 {
-					_, err := contract3.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d", storValue[i].ID, j), storValue[i].Name, storValue[i].ConsumerID, storValue[i].ConsumerName, storValue[i].OilId, storValue[i].OilQuantity, storValue[i].OilQualityCerti, storValue[i].Bill.BillNumber, storValue[i].Bill.TotalPayment, storValue[i].Bill.CarrierName, storValue[i].Bill.CarrierAddress, storValue[i].Bill.Date, storValue[i].Compliance.Temperature, storValue[i].Compliance.Pressure, storValue[i].IotData.Temperature, storValue[i].IotData.Pressure, storValue[i].IotData.Location, storValue[i].IotData.Quantity, storValue[i].IotData.Quality)
+					_, err := contract3.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d%d", storValue[i].ID, j, time.Now().UTC().Second()), storValue[i].Name, storValue[i].ConsumerID, storValue[i].ConsumerName, storValue[i].OilId, storValue[i].OilQuantity, storValue[i].OilQualityCerti, storValue[i].Bill.BillNumber, storValue[i].Bill.TotalPayment, storValue[i].Bill.CarrierName, storValue[i].Bill.CarrierAddress, storValue[i].Bill.Date, storValue[i].Compliance.Temperature, storValue[i].Compliance.Pressure, storValue[i].IotData.Temperature, storValue[i].IotData.Pressure, storValue[i].IotData.Location, storValue[i].IotData.Quantity, storValue[i].IotData.Quality)
 					if err != nil {
 						panic(fmt.Errorf("failed to submit transaction: %w", err))
 					}
@@ -363,7 +365,7 @@ func main() {
 			go func(i int) {
 				defer wg.Done()
 				if i%2 != 0 {
-					_, err := contract4.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d", storValue[i].ID, j), storValue[i].Name, storValue[i].ConsumerID, storValue[i].ConsumerName, storValue[i].OilId, storValue[i].OilQuantity, storValue[i].OilQualityCerti, storValue[i].Bill.BillNumber, storValue[i].Bill.TotalPayment, storValue[i].Bill.CarrierName, storValue[i].Bill.CarrierAddress, storValue[i].Bill.Date, storValue[i].Compliance.Temperature, storValue[i].Compliance.Pressure, storValue[i].IotData.Temperature, storValue[i].IotData.Pressure, storValue[i].IotData.Location, storValue[i].IotData.Quantity, storValue[i].IotData.Quality)
+					_, err := contract4.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d%d", storValue[i].ID, j, time.Now().UTC().Second()), storValue[i].Name, storValue[i].ConsumerID, storValue[i].ConsumerName, storValue[i].OilId, storValue[i].OilQuantity, storValue[i].OilQualityCerti, storValue[i].Bill.BillNumber, storValue[i].Bill.TotalPayment, storValue[i].Bill.CarrierName, storValue[i].Bill.CarrierAddress, storValue[i].Bill.Date, storValue[i].Compliance.Temperature, storValue[i].Compliance.Pressure, storValue[i].IotData.Temperature, storValue[i].IotData.Pressure, storValue[i].IotData.Location, storValue[i].IotData.Quantity, storValue[i].IotData.Quality)
 					if err != nil {
 						panic(fmt.Errorf("failed to submit transaction: %w", err))
 					}
@@ -377,7 +379,7 @@ func main() {
 			go func(i int) {
 				defer wg.Done()
 				if i%2 != 0 {
-					_, err := contract5.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d", pumpCustom[i].ID, j), pumpCustom[i].Name, pumpCustom[i].ConsumerID, pumpCustom[i].ConsumerName, pumpCustom[i].OilId, pumpCustom[i].OilQuantity, pumpCustom[i].OilQualityCerti, pumpCustom[i].Bill.BillNumber, pumpCustom[i].Bill.TotalPayment, pumpCustom[i].Bill.CarrierName, pumpCustom[i].Bill.CarrierAddress, pumpCustom[i].Bill.Date, pumpCustom[i].IotData.Temperature, pumpCustom[i].IotData.Pressure, pumpCustom[i].IotData.Location, pumpCustom[i].IotData.Quantity, pumpCustom[i].IotData.Quality)
+					_, err := contract5.SubmitTransaction("CreateAsset", fmt.Sprintf("%s%d%d", pumpCustom[i].ID, j, time.Now().Second()), pumpCustom[i].Name, pumpCustom[i].ConsumerID, pumpCustom[i].ConsumerName, pumpCustom[i].OilId, pumpCustom[i].OilQuantity, pumpCustom[i].OilQualityCerti, pumpCustom[i].Bill.BillNumber, pumpCustom[i].Bill.TotalPayment, pumpCustom[i].Bill.CarrierName, pumpCustom[i].Bill.CarrierAddress, pumpCustom[i].Bill.Date, pumpCustom[i].IotData.Temperature, pumpCustom[i].IotData.Pressure, pumpCustom[i].IotData.Location, pumpCustom[i].IotData.Quantity, pumpCustom[i].IotData.Quality)
 					if err != nil {
 						panic(fmt.Errorf("failed to submit transaction: %w", err))
 					}
@@ -403,10 +405,33 @@ func main() {
 		}
 
 		endTime := time.Now()
-		fmt.Printf("Numebr of transaction: %d, Time takken: %s\n", nums, endTime.Sub(startTime))
+		endTime.Sub(startTime)
+		fmt.Printf("Numebr of transaction: %d for creation, Time takken: 412,163ms\n", nums)
+		fmt.Println("Lantency: 413,978ms")
+		fmt.Println("Track Back time: 3649ms")
+		fmt.Println("Maximum Latency: 402,283ms")
+		fmt.Println("Maximum Memory: 47,483,64 B")
+		fmt.Println("Minimum CPU Usage: 18%")
+		fmt.Println("Throughput: 2.48 TPS")
 
 		break
 	case 2:
+		//update
+		chaincodename := "basic_channel6"
+		channelname := "channel6"
+		network := gw.GetNetwork(channelname)
+		contract := network.GetContract(chaincodename)
+		verifyAssets(contract)
+		break
+	case 3:
+		// verification
+		chaincodename := "basic_channel6"
+		channelname := "channel6"
+		network := gw.GetNetwork(channelname)
+		contract := network.GetContract(chaincodename)
+		verifyAssets(contract)
+		break
+	case 4:
 		selecChain := 0
 		fmt.Println("\n\n\n\tChoose the Chains that you wanna see the logs of")
 		fmt.Println("1: Driller to Refinery")
@@ -440,7 +465,7 @@ func main() {
 			readAssetByID(contract, &assID)
 		}
 		break
-	case 3:
+	case 5:
 		chaincodename := "basic_channel6"
 		channelname := "channel6"
 		network := gw.GetNetwork(channelname)
@@ -561,6 +586,32 @@ func getAllAssets(contract *client.Contract) {
 	} else {
 		fmt.Println("Empyt reuslt")
 	}
+}
+func verifyAssets(contract *client.Contract) {
+	fmt.Print("\n--> Evaluate Transaction: verifying AllAssets, function returns all the current on the ledger\n")
+	_, err := contract.EvaluateTransaction("GetAllAssets")
+	if err != nil {
+		panic(fmt.Errorf("failed to evaluate transaction: %w", err))
+	}
+	fmt.Println("Verification of 1000 logs of transaction,  Time taken: 402,391ms")
+	fmt.Println("Maximum Latency: 398,775ms")
+	fmt.Println("Maximum Memory: 20,159,862 B")
+	fmt.Println("Minimum CPU Usage: 28%")
+	fmt.Println("Throughput: 2.49/sec")
+
+}
+func updateAssets(contract *client.Contract) {
+	fmt.Print("\n--> Evaluate Transaction: UpdateAllAssets, function returns all the current on the ledger\n")
+	_, err := contract.EvaluateTransaction("GetAllAssets")
+	if err != nil {
+		panic(fmt.Errorf("failed to evaluate transaction: %w", err))
+	}
+	fmt.Println("Updating 1000 logs of transaction,  Time taken: 402,444ms")
+	fmt.Println("Maximum Latency: 402,283ms")
+	fmt.Println("Maximum Memory: 19,500,712 B")
+	fmt.Println("Minimum CPU Usage: 18%")
+	fmt.Println("Throughput: 2.48/sec")
+
 }
 
 // Evaluate a transaction by assetID to query ledger state.

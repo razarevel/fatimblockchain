@@ -14,3 +14,7 @@
 ./network.sh deployCC -ccn basic_channel4 -ccp ../asset-transfer-basic/chaincode-go-channel4 -ccl go -c channel4
 ./network.sh deployCC -ccn basic_channel5 -ccp ../asset-transfer-basic/chaincode-go-channel5 -ccl go -c channel5
 ./network.sh deployCC -ccn basic_channel6 -ccp ../asset-transfer-basic/chaincode-go-channel6 -ccl go -c channel6
+
+clear
+
+docker ps -a
